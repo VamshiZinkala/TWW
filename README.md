@@ -1,29 +1,22 @@
 # TWW Engineering Assessment – Campaign Events Service
 
-A Go-based HTTP service for ingesting campaign events, validating event data, detecting duplicates and conflicts, and calculating campaign statistics.
+## Project Overview
 
-## Features
+This project implements a REST API service in Go for ingesting campaign events, validating event data, identifying duplicates and conflicts, and generating campaign statistics.
 
-- Ingest campaign events through a REST API.
-- Validate incoming event data.
-- Detect duplicate events and conflicting event IDs.
-- Process events in batches with per-event results.
-- Calculate campaign statistics, including total and unique opens and clicks.
-- Track the latest event and ingestion timestamps.
-- Store events in memory.
-- Include automated tests and a separate debugging exercise.
+The service uses in-memory storage and supports concurrent event processing.
 
-## Technology
+## Technology Stack
 
-- Go 1.22+
-- Go standard library
-- In-memory storage
-- Go testing and race detector
+- **Language:** Go 1.22+
+- **HTTP Server:** Go standard library
+- **Storage:** In-memory
+- **Testing:** Go testing package and race detector
 
 ## Project Structure
 
 ```text
-.
+TWW Main Task/
 ├── main.go
 ├── handlers.go
 ├── store.go
@@ -49,29 +42,29 @@ A Go-based HTTP service for ingesting campaign events, validating event data, de
 
 ### Prerequisites
 
-Install Go 1.22 or later.
+- Go 1.22 or later
 
-Check your installation:
+Verify Go installation:
 
 ```bash
 go version
 ```
 
-### Run the service
+### Run the application
 
-From the project root:
+From the project root directory:
 
 ```bash
 go run .
 ```
 
-The service runs on port `8080`.
+The server runs on port `8080`.
 
 ## API Endpoints
 
-### 1. Ingest campaign events
+### 1. Ingest Events
 
-**POST** `/events`
+**Endpoint:** `POST /events`
 
 Accepts a JSON array of campaign events.
 
@@ -85,11 +78,11 @@ Invoke-RestMethod `
     -InFile ".\seed\events.json"
 ```
 
-The response provides a result for each submitted event, identifying accepted events, duplicates, conflicts, and rejected events.
+Each event is processed independently and receives a result indicating whether it was accepted, identified as a duplicate, rejected due to a conflict, or rejected due to validation errors.
 
-### 2. Get campaign statistics
+### 2. Get Campaign Statistics
 
-**GET** `/campaigns/{campaign_id}/stats`
+**Endpoint:** `GET /campaigns/{campaign_id}/stats`
 
 Example:
 
@@ -97,7 +90,7 @@ Example:
 http://localhost:8080/campaigns/cmp_welcome/stats
 ```
 
-The statistics include:
+The response provides campaign statistics, including:
 
 - Sent events
 - Delivered events
@@ -112,19 +105,11 @@ Unknown campaign IDs return zero counts and null timestamps.
 
 ## Seed Data Verification
 
-Submit the seed file:
-
-```powershell
-Invoke-RestMethod `
-    -Uri "http://localhost:8080/events" `
-    -Method Post `
-    -ContentType "application/json" `
-    -InFile ".\seed\events.json"
-```
+Submit the seed file using the `POST /events` endpoint.
 
 Expected first-upload results:
 
-| Status | Count |
+| Result | Expected Count |
 |---|---:|
 | Accepted | 210 |
 | Duplicate | 15 |
@@ -132,11 +117,11 @@ Expected first-upload results:
 | Rejected | 7 |
 | **Total** | **235** |
 
-Submitting the same seed data again should not create additional accepted events.
+Submitting the same seed file again should not create additional accepted events.
 
-## Running Tests
+## Testing
 
-Run the test suite:
+Run all tests:
 
 ```bash
 go test ./...
@@ -145,18 +130,31 @@ go test ./...
 Run tests with the race detector:
 
 ```bash
-go test -race ./...
+go test -race -count=1 ./...
 ```
 
-Check code using:
+Check the code:
 
 ```bash
 go vet ./...
 ```
 
+The test suite covers:
+
+- Duplicate event handling
+- Mixed batches containing invalid events
+- Conflicting event IDs
+- Out-of-order event timestamps
+- Total and unique event statistics
+- Invalid request formats
+- Unknown campaign statistics
+- Request body size limits
+- Seed-file ingestion
+- Concurrent event processing
+
 ## Debugging Exercise
 
-The separate debugging exercise is located in the `debugging/` directory.
+The debugging exercise is maintained separately in the `debugging/` directory.
 
 Run it from that directory:
 
@@ -165,21 +163,28 @@ cd debugging
 go run -race . events.jsonl
 ```
 
-Compare the generated output with `expected_output.txt`.
+Compare its output with `expected_output.txt`.
+
+The debugging exercise includes fixes for:
+
+1. Duplicate tracking across batches.
+2. Unique-open tracking across campaigns.
+3. UTC-based daily grouping.
+4. Thread-safe counter updates.
 
 ## Design Considerations
 
 - Standard-library-only implementation.
 - In-memory event storage.
-- Event validation before processing.
+- Validation before event processing.
 - Duplicate detection based on campaign, contact, event type, and timestamp instant.
-- Event metadata does not affect duplicate identification.
-- Thread-safe access to shared state.
-- Idempotent ingestion for repeated event submissions.
+- Event metadata is ignored during duplicate comparison.
+- Thread-safe shared-state access.
+- Idempotent handling of repeated event submissions.
 
 ## Additional Documentation
 
-- `NOTES.md` – Assumptions, design decisions, and scalability considerations.
-- `BUGS.md` – Debugging exercise findings and fixes.
-- `AI_USAGE.md` – Disclosure of AI assistance used during development.
+- **NOTES.md:** Assumptions, design decisions, PM questions, and scalability considerations.
+- **BUGS.md:** Debugging findings, identified bugs, and fixes.
+- **AI_USAGE.md:** Disclosure of AI assistance used during development.
 
