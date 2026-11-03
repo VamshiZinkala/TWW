@@ -188,3 +188,37 @@ The debugging exercise includes fixes for:
 - **BUGS.md:** Debugging findings, identified bugs, and fixes.
 - **AI_USAGE.md:** Disclosure of AI assistance used during development.
 
+## Future Improvements
+
+If given more time, I would focus on the following improvements to make the service more scalable, reliable, and production-ready.
+
+### 1. Persistent Database
+Replace the current in-memory storage with PostgreSQL or another database to ensure that event data persists even after application restarts.
+
+### 2. Scalability
+Introduce message queues and asynchronous batch processing to handle high-volume event ingestion, potentially scaling to 100 million events per day.
+
+### 3. Performance Optimization
+Implement database indexing, optimized queries, and caching to improve event ingestion and campaign statistics retrieval.
+
+### 4. Monitoring and Logging
+Add structured logging, application metrics, health checks, and monitoring to identify errors and performance bottlenecks.
+
+### 5. API Improvements
+Enhance the API with pagination, consistent error responses, authentication, and API documentation.
+
+### 6. Additional Testing
+Expand test coverage with integration tests, load testing, benchmarks, and additional edge cases.
+
+### 7. Deployment and Automation
+Containerize the application using Docker and introduce a CI/CD pipeline to automate testing, building, and deployment.
+
+### Implementation Priority
+
+My initial priorities would be:
+
+1. Persistent database integration.
+2. Scalable event ingestion and processing.
+3. Monitoring and performance optimization.
+
+These improvements would help evolve the current implementation into a reliable production-ready campaign events service.
