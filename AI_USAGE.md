@@ -1,55 +1,59 @@
-# AI_USAGE.md
+# AI Usage Disclosure
 
-## 1. Tools I Used
+## AI Tools Used
 
-- ChatGPT
+ChatGPT was used as an AI assistance tool during the development of this assessment.
 
-*Add Claude only if I personally used it during this assessment.*
+## Areas Where AI Assistance Was Used
 
-## 2. How I Used AI
+AI assistance was used for the following activities:
 
-I used ChatGPT to understand the assignment and identify what I needed to complete.
+1. **Requirement Understanding**
+   - Understanding the assessment requirements.
+   - Clarifying API behavior, validation rules, duplicate detection, and conflict handling.
+   - Reviewing assumptions and identifying questions that could be discussed with the product manager.
 
-I also used it to:
-- Understand the Go backend structure and how the API should work.
-- Discuss event validation, duplicate event handling, and campaign statistics.
-- Understand concurrency issues and how to fix them.
-- Review the four debugging problems and possible solutions.
-- Improve my documentation, including `NOTES.md` and `BUGS.md`.
-- Check my testing approach and final submission requirements.
+2. **Implementation Assistance**
+   - Discussing Go implementation approaches.
+   - Understanding HTTP handlers, JSON processing, event storage, and campaign statistics.
+   - Reviewing concurrency-related implementation considerations.
 
-I did not blindly accept the suggestions. I reviewed the code, ran the program, compared the output with the expected results, and checked concurrency using Go's race detector.
+3. **Debugging Assistance**
+   - Understanding the debugging exercise and investigating the identified issues.
+   - Discussing duplicate tracking, unique-open calculations, UTC timestamp grouping, and concurrent counter updates.
 
-I am responsible for the final implementation and its behaviour.
+4. **Testing Assistance**
+   - Identifying relevant test scenarios.
+   - Understanding how to run Go tests and use the race detector.
+   - Reviewing test output and expected seed-file results.
 
-## 3. One AI Suggestion I Rejected or Changed
+5. **Documentation Assistance**
+   - Improving the structure and clarity of README.md, NOTES.md, BUGS.md, and AI_USAGE.md.
 
-I decided to use a **first-write-wins** approach for duplicate event IDs.
+## Validation and Verification
 
-If an event ID has already been processed and another event arrives with the same ID but different data, I keep the original event instead of replacing it.
+The implementation was reviewed and tested locally.
 
-I chose this because a delayed retry or conflicting provider payload should not silently change statistics that were already recorded.
+The following verification commands were executed:
 
-## 4. One Thing AI Helped Me Understand
-
-I understood why duplicate checking and updating statistics must be handled safely when multiple requests arrive at the same time.
-
-For example, two requests might arrive with the same event ID. If both check the ID before either inserts it, both could think it is a new event and count it twice.
-
-Using a mutex to protect the relevant operations ensures that only one goroutine can perform the protected update at a time within a single service process.
-
-## 5. Anything AI Generated That I Had to Debug or Correct
-
-While checking the debugging program, I noticed that some output format strings contained incorrectly escaped newline characters. Instead of printing each campaign on a separate line, the program printed literal `\n` characters.
-
-I corrected the newline escaping in the output formatting and ran the program again.
-
-I then compared `actual_output.txt` with `expected_output.txt` using PowerShell's `Compare-Object`. The comparison returned no differences.
-
-I also ran the debugging program with Go's race detector:
-
-```powershell
-go run -race .\debugging\main.go .\debugging\events.jsonl
+```bash
+go test -v -race -count=1 ./...
+go vet ./...
 ```
 
-The program completed without reporting a data race.
+The test suite completed successfully with no reported failures or race conditions.
+
+The debugging exercise was also executed with Go's race detector, and its actual output was compared with the expected output.
+
+The seed-file ingestion was verified against the expected results:
+
+- Accepted: 210
+- Duplicate: 15
+- Conflict: 3
+- Rejected: 7
+
+## Responsibility
+
+AI assistance was used to support understanding, implementation, debugging, testing, and documentation.
+
+The project was run and verified in the local development environment. This disclosure is intended to transparently describe the use of AI assistance during the assessment.
